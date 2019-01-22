@@ -128,8 +128,11 @@
         "typescript": "^2.6.1"
     },
     "dependencies": {
+        "@types/expand-tilde": "^2.0.0",
+        "expand-tilde": "^2.0.2",
+        "fast-plist": "^0.1.2",
         "homebrew-services": "0.1.0",
-        "vscode": "^1.1.6"
+        "vscode": "^1.1.27"
     },
     "jest": {
         "transform": {

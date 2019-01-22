@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { TreeDataProvider, TreeItem } from 'vscode';
 import { upperFirst, toStatus } from './helpers';
+import { LaunchCtl }from './helpers/launchctl';
 
 const brew = require('homebrew-services');
 
@@ -13,6 +14,7 @@ export default class BrewExplorer implements TreeDataProvider<any> {
 
   refresh() {
     this.onDidChange.fire();
+    let l: LaunchCtl = new LaunchCtl('~/wow');
   }
 
   public async getChildren() {
