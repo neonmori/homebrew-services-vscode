@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import brewExplorer from './brewExplorer';
 
-export function activate() {
-  const explorer = new brewExplorer();
+export function activate(context: vscode.ExtensionContext) {
+  const explorer = new brewExplorer(vscode.workspace.getConfiguration().get('brewer.labels'));
 
   vscode.window.registerTreeDataProvider('brewExplorer', explorer);
 
