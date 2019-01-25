@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import { TreeDataProvider, TreeItem } from 'vscode';
 import { upperFirst, toStatus } from './helpers';
-import { LaunchCtl }from './helpers/launchctl';
+import LaunchCtl from './helpers/LaunchCtl';
 
 const brew = require('homebrew-services');
 

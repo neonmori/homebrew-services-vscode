@@ -2,8 +2,12 @@ import * as fs from 'fs';
 import expandTilde = require('expand-tilde');
 import { parse } from 'fast-plist';
 import { exec, execSync } from 'child_process';
+import { promisify } from 'util';
 
-export class LaunchCtl {
+const readFile = promisify(fs.readFile);
+const execp = promisify(exec);
+
+export default class LaunchCtl {
   path: string;
   name: string;
   constructor(path: string) {
@@ -11,23 +15,16 @@ export class LaunchCtl {
     this.name = 'Unknown';
   }
 
-  init(): Promise<any> {
-    return new Promise((resolve, reject) => {
-      fs.readFile(this.path, 'utf8', (err, plist) => {
-        if (err) {
-          return reject(err);
-        }
-        const parsedPlist = parse(plist);
-        if (!parsedPlist) {
-          reject(new Error('Cannot parse plist!'));
-        }
-        if (!parsedPlist.hasOwnProperty('Label')) {
-          reject(Error('Property list has no label'));
-        }
-        this.name = parsedPlist.Label;
-        resolve();
-      });
-    });
+  public async init() {
+    const plist = await readFile(this.path, 'utf8');
+    const parsedPlist = parse(plist);
+    if (!parsedPlist) {
+      throw new Error('Cannot parse plist!');
+    }
+    if (!parsedPlist.hasOwnProperty('Label')) {
+      throw new Error('Property list has no field "label"');
+    }
+    this.name = parsedPlist.Label;
   }
 
   /**
@@ -48,19 +45,13 @@ export class LaunchCtl {
     this.name = parsedPlist.Label;
   }
 
-      /**
-     * Checks if service currently running (asynchronous).
-     * @return {Promise}
-     */
-  running(): Promise<any> {
-    return new Promise((resolve, reject) => {
-      exec('launchctl list', (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result.includes(this.name));
-      });
-    });
+  /**
+   * Checks if service currently running (asynchronous).
+   * @return {Promise}
+   */
+  public async isRunning(): Promise<boolean> {
+    const result = await execp('launchctl list');
+    return result.stdout.includes(this.name);
   }
 
   /**
@@ -74,15 +65,8 @@ export class LaunchCtl {
   /**
    * Unloads service (asynchronous).
    */
-  unload(): Promise<any> {
-    return new Promise((resolve, reject) => {
-      exec(`launchctl unload ${this.path}`, (err, data) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve();
-      });
-    });
+  public async unload() {
+    return await execp(`launchctl unload ${this.path}`);
   }
 
   /**
@@ -95,15 +79,8 @@ export class LaunchCtl {
   /**
    * Loads service (asynchronous).
    */
-  load(): Promise<any> {
-    return new Promise((resolve, reject) => {
-      exec(`launchctl load ${this.path}`, (err, data) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve();
-      });
-    });
+  public async load() {
+    return await execp(`launchctl load ${this.path}`);
   }
 
   /**
