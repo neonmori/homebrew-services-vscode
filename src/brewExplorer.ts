@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { TreeDataProvider, TreeItem } from 'vscode';
 import { upperFirst, toStatus } from './helpers';
 import expandTilde = require('expand-tilde');
-import LaunchCtl from './helpers/LaunchCtl';
+import { LaunchCtl, LaunchCtlStatus } from './helpers/LaunchCtl';
 import { list as listServices } from './launchServices';
 
 const brew = require('homebrew-services');
@@ -35,7 +35,7 @@ export default class BrewExplorer implements TreeDataProvider<any> {
   }
 
   public async getTreeItem(service: LaunchCtl): Promise<TreeItem> {
-    const status: string = (await service.isRunning()) ? 'started' : 'stopped';
+    const status = await service.update();
     const generatePath = (style: string) => `${__dirname}/../resources/${status}${style}.svg`;
 
     const iconPath = {
@@ -46,7 +46,7 @@ export default class BrewExplorer implements TreeDataProvider<any> {
     return {
       iconPath,
       label: service.name,
-      contextValue: 'serviceItem',
+      contextValue: `serviceItem${status}`,
     };
   }
 
@@ -66,7 +66,23 @@ export default class BrewExplorer implements TreeDataProvider<any> {
 
   public async restart(target: LaunchCtl) {
     const message = `LaunchCtl: Restarting ${target.name}`;
-    return vscode.window.setStatusBarMessage(message, )
+    return vscode.window.setStatusBarMessage(message, target.restart()
+      .catch(() => ({ stderr: 'error', stdout: '' }))
+      .then(() => this.refresh()));
+  }
+
+  public async start(target: LaunchCtl) {
+    const message = `LaunchCtl: Restarting ${target.name}`;
+    return vscode.window.setStatusBarMessage(message, target.start()
+      .catch(() => ({ stderr: 'error', stdout: '' }))
+      .then(() => this.refresh()));
+  }
+
+  public async stop(target: LaunchCtl) {
+    const message = `LaunchCtl: Restarting ${target.name}`;
+    return vscode.window.setStatusBarMessage(message, target.stop()
+      .catch(() => ({ stderr: 'error', stdout: '' }))
+      .then(() => this.refresh()));
   }
 
   public async openLog(stderr: boolean, target: LaunchCtl) {
