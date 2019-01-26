@@ -89,4 +89,8 @@ export default class LaunchCtl {
   loadSync() {
     execSync(`launchctl load ${this.path}`);
   }
+
+  public async viewLog() {
+    return { status: 'normal' };
+  }
 }
