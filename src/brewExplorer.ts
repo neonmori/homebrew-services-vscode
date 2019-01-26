@@ -3,32 +3,25 @@
 import * as vscode from 'vscode';
 import { TreeDataProvider, TreeItem } from 'vscode';
 import { upperFirst, toStatus } from './helpers';
-import { promisify } from 'util';
-import * as fs from 'fs';
 import expandTilde = require('expand-tilde');
 import LaunchCtl from './helpers/LaunchCtl';
+import { list as listServices } from './launchServices';
 
 const brew = require('homebrew-services');
-
-const readdirp = promisify(fs.readdir);
-
-function readAllUserAgents(): string[] {
-  const agentsFolder = expandTilde('~/Library/LaunchAgents/');
-  return fs.readdirSync(agentsFolder).map((v: string) => `${agentsFolder}${v}`);
-}
 
 export default class BrewExplorer implements TreeDataProvider<any> {
 
   private onDidChange: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
   readonly onDidChangeTreeData = this.onDidChange.event;
-  private items: string[];
+  private agentsFolder = expandTilde('~/Library/LaunchAgents/');
+  // private items: string[];
 
   constructor(items?: string[]) {
-    if (items) {
-      this.items = items;
-    } else {
-      this.items = readAllUserAgents();
-    }
+    // if (items) {
+    //   this.items = items;
+    // } else {
+    //   this.items = readAllUserAgents();
+    // }
   }
 
   refresh() {
@@ -36,12 +29,13 @@ export default class BrewExplorer implements TreeDataProvider<any> {
   }
 
   public async getChildren() {
-    const agentsFolder = expandTilde('~/Library/LaunchAgents/');
-    return await readdirp(agentsFolder);
+    const services = await listServices(this.agentsFolder)
+      .catch(() => ([]));
+    return services;
   }
 
-  public getTreeItem(path: string): TreeItem {
-    const status = 'started';
+  public async getTreeItem(service: LaunchCtl): Promise<TreeItem> {
+    const status: string = (await service.isRunning()) ? 'started' : 'stopped';
     const generatePath = (style: string) => `${__dirname}/../resources/${status}${style}.svg`;
 
     const iconPath = {
@@ -51,7 +45,7 @@ export default class BrewExplorer implements TreeDataProvider<any> {
 
     return {
       iconPath,
-      label: `${path}`,
+      label: service.name,
       contextValue: 'serviceItem',
     };
   }
