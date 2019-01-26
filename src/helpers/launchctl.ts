@@ -10,6 +10,9 @@ const execp = promisify(exec);
 export default class LaunchCtl {
   path: string;
   name: string;
+  log: string = '';
+  errorlog: string = '';
+
   constructor(path: string) {
     this.path = expandTilde(path);
     this.name = 'Unknown';
@@ -25,6 +28,9 @@ export default class LaunchCtl {
       throw new Error('Property list has no field "label"');
     }
     this.name = parsedPlist.Label;
+    this.log = parsedPlist.StandardOutPath;
+    this.errorlog = parsedPlist.StandardErrorPath;
+
   }
 
   /**
@@ -90,7 +96,59 @@ export default class LaunchCtl {
     execSync(`launchctl load ${this.path}`);
   }
 
+  public async agentStatus() {
+    const output = await execp(`launchctl list`);
+    const lines = output.stdout ? output.stdout.split('\n').slice(1) : [];
+    const line = lines.filter(line => line.includes(this.name));
+    if (!line.length) {
+      return { pid: -1, status: -1, loaded: false };
+    }
+    const data = line[0].split(/\s+/);
+    const pid = (data[0] === '-') ? -1 : data[0];
+    return { pid, status: +data[1], loaded: true };
+  }
+
+  public async start() {
+    return await execp(`launchctl start ${this.name}`);
+  }
+
+  public async stop() {
+    return await execp(`launchctl stop ${this.name}`);
+  }
+
+  public async restart() {
+    const ag = await this.agentStatus();
+    if (ag.loaded) {
+      if (ag.pid === -1 && ag.status === 0) {
+        // echo --Unload
+        // echo --Reload
+        // echo --Start
+        // echo "--Idle"
+        // echo "--No Errors"
+      } else if (ag.pid > 0 && ag.status === 0) {
+        // echo --Unload
+        // echo --Reload
+        // echo --Stop
+        // echo "--Running ($pid)"
+        // echo "--No Errors"
+      } else if (ag.status > 0) {
+        // echo --Unload
+        // echo --Reload
+        // echo --Start
+        // echo "--Stopped"
+        // echo "--Errors"
+      }
+    } else {
+      // --load
+      // "--Unloaded"
+    }
+  }
+
   public async viewLog() {
-    return { status: 'normal' };
+    return await execp(`open ${this.log}`);
+  }
+
+  public async viewErrorLog() {
+    return await execp(`open ${this.errorlog}`);
   }
 }

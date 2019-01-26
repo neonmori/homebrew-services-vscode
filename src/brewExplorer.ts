@@ -50,19 +50,23 @@ export default class BrewExplorer implements TreeDataProvider<any> {
     };
   }
 
-  public async execute(command: string, target: LaunchCtl) {
-    console.log('command: ', command);
-    const message = `Brew: ${toStatus[command]} ${upperFirst(args[0])}`;
-    return vscode.window.setStatusBarMessage(message, brew[command]({ service: args[0] })
-      .catch(() => ({ status: 'error' }))
-      .then(() => this.refresh()));
-  }
-
   public async load(target: LaunchCtl) {
-    const message = `LaunchCtl: Starting ${target.name}`;
+    const message = `LaunchCtl: Loading ${target.name}`;
     return vscode.window.setStatusBarMessage(message, target.load()
       .catch(() => ({ stderr: 'error', stdout: '' }))
       .then(() => this.refresh()));
+  }
+
+  public async unload(target: LaunchCtl) {
+    const message = `LaunchCtl: Unloading ${target.name}`;
+    return vscode.window.setStatusBarMessage(message, target.unload()
+    .catch(() => ({ stderr: 'error', stdout: '' }))
+    .then(() => this.refresh()));
+  }
+
+  public async restart(target: LaunchCtl) {
+    const message = `LaunchCtl: Restarting ${target.name}`;
+    return vscode.window.setStatusBarMessage(message, )
   }
 
   public async openLog(stderr: boolean, target: LaunchCtl) {

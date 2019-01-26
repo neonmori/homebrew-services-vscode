@@ -10,6 +10,8 @@ Available on the [VS Marketplace][marketplace].
 
 ### Attributions
 
+https://visualpharm.com/free-icons/launched%20rocket-595b40b75ba036ed117d801a
+
 [Typicons][typicons] by Stephen Hutchings - Fantastic open source icons.
 
 <!-- Links -->

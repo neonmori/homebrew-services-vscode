@@ -102,7 +102,7 @@
                 {
                     "icon": "resources/icon.svg",
                     "id": "brewExplorer",
-                    "title": "Homebrew Services"
+                    "title": "Launch Agents"
                 }
             ]
         }
@@ -121,6 +121,7 @@
     "devDependencies": {
         "@types/jest": "^22.2.2",
         "@types/node": "^10.12.18",
+        "@types/expand-tilde": "^2.0.0",
         "jest": "^22.4.3",
         "ts-jest": "^22.4.2",
         "tslint": "^5.8.0",
@@ -128,7 +129,6 @@
         "typescript": "^2.6.1"
     },
     "dependencies": {
-        "@types/expand-tilde": "^2.0.0",
         "expand-tilde": "^2.0.2",
         "fast-plist": "^0.1.2",
         "homebrew-services": "0.1.0",
