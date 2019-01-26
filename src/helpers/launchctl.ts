@@ -1,8 +1,9 @@
 import * as fs from 'fs';
 import expandTilde = require('expand-tilde');
 import { parse } from 'fast-plist';
-import { exec, execSync } from 'child_process';
+import { exec } from 'child_process';
 import { promisify } from 'util';
+import { start } from 'repl';
 
 const readFile = promisify(fs.readFile);
 const execp = promisify(exec);
@@ -74,38 +75,38 @@ export class LaunchCtl {
     const output = await execp(`launchctl list`);
     const lines = output.stdout ? output.stdout.split('\n').slice(1) : [];
     const line = lines.filter(line => line.includes(this.name));
-    if (!line.length) {
-      // --load
-      // "--Unloaded"
-      return LaunchCtlStatus.UNLOADED;
+    if (line.length > 0) {
+      const data = line[0].split(/\s+/);
+      const pid = (data[0] === '-') ? -1 : data[0];
+      const status = +data[1];
+      if (pid === -1 && status === 0) {
+        return LaunchCtlStatus.IDLE;
+        // echo --Unload
+        // echo --Reload
+        // echo --Start
+        // echo "--Idle"
+        // echo "--No Errors"
+      }
+      if (pid > 0 && status === 0) {
+        return LaunchCtlStatus.RUNNING;
+        // echo --Unload
+        // echo --Reload
+        // echo --Stop
+        // echo "--Running ($pid)"
+        // echo "--No Errors"
+      }
+      if (status > 0) {
+        return LaunchCtlStatus.ERROR;
+        // echo --Unload
+        // echo --Reload
+        // echo --Start
+        // echo "--Stopped"
+        // echo "--Errors"
+      }
     }
-    const data = line[0].split(/\s+/);
-    const pid = (data[0] === '-') ? -1 : data[0];
-    const status = +data[1];
-    if (pid === -1 && status === 0) {
-      return LaunchCtlStatus.IDLE;
-      // echo --Unload
-      // echo --Reload
-      // echo --Start
-      // echo "--Idle"
-      // echo "--No Errors"
-    }
-    if (pid > 0 && status === 0) {
-      return LaunchCtlStatus.RUNNING;
-      // echo --Unload
-      // echo --Reload
-      // echo --Stop
-      // echo "--Running ($pid)"
-      // echo "--No Errors"
-    }
-    if (status > 0) {
-      return LaunchCtlStatus.ERROR;
-      // echo --Unload
-      // echo --Reload
-      // echo --Start
-      // echo "--Stopped"
-      // echo "--Errors"
-    }
+    // --load
+    // "--Unloaded"
+    return LaunchCtlStatus.UNLOADED;
   }
 
   public async start() {
@@ -117,8 +118,8 @@ export class LaunchCtl {
   }
 
   public async restart() {
-    const ag = await this.update();
-    
+    await this.stop();
+    return await this.start();
   }
 
   public async viewLog(stderr: boolean) {

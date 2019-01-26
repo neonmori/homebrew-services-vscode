@@ -2,12 +2,9 @@
 
 import * as vscode from 'vscode';
 import { TreeDataProvider, TreeItem } from 'vscode';
-import { upperFirst, toStatus } from './helpers';
 import expandTilde = require('expand-tilde');
-import { LaunchCtl, LaunchCtlStatus } from './helpers/LaunchCtl';
+import { LaunchCtl } from './helpers/LaunchCtl';
 import { list as listServices } from './launchServices';
-
-const brew = require('homebrew-services');
 
 export default class BrewExplorer implements TreeDataProvider<any> {
 
@@ -87,7 +84,7 @@ export default class BrewExplorer implements TreeDataProvider<any> {
 
   public async openLog(stderr: boolean, target: LaunchCtl) {
     const message = `LaunchCtl: view ${stderr ? 'error ' : ' '}log for ${target.name}`;
-    return vscode.window.setStatusBarMessage(message, target.viewLog()
+    return vscode.window.setStatusBarMessage(message, target.viewLog(stderr)
       .catch(() => ({ status: 'error' }))
       .then(() => this.refresh()));
   }
