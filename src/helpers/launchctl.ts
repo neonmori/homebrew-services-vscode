@@ -76,27 +76,19 @@ export default class LaunchCtl {
   }
 
   /**
-   * Unloads service (synchronous).
-   */
-  unloadSync() {
-    execSync(`launchctl unload ${this.path}`);
-  }
-
-  /**
    * Loads service (asynchronous).
    */
   public async load() {
     return await execp(`launchctl load ${this.path}`);
   }
 
-  /**
-   * Loads service (synchronous).
-   */
-  loadSync() {
-    execSync(`launchctl load ${this.path}`);
+
+  public async reload() {
+    await this.unload();
+    return await this.load();
   }
 
-  public async agentStatus() {
+  public async update() {
     const output = await execp(`launchctl list`);
     const lines = output.stdout ? output.stdout.split('\n').slice(1) : [];
     const line = lines.filter(line => line.includes(this.name));
@@ -117,7 +109,7 @@ export default class LaunchCtl {
   }
 
   public async restart() {
-    const ag = await this.agentStatus();
+    const ag = await this.update();
     if (ag.loaded) {
       if (ag.pid === -1 && ag.status === 0) {
         // echo --Unload
@@ -145,10 +137,10 @@ export default class LaunchCtl {
   }
 
   public async viewLog() {
-    return await execp(`open ${this.log}`);
+    return await execp(`open -a Console ${this.log}`);
   }
 
   public async viewErrorLog() {
-    return await execp(`open ${this.errorlog}`);
+    return await execp(`open -a Console ${this.errorlog}`);
   }
 }
