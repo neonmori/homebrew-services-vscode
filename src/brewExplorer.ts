@@ -3,12 +3,14 @@
 import * as vscode from 'vscode';
 import { TreeDataProvider, TreeItem } from 'vscode';
 import { upperFirst, toStatus } from './helpers';
-// import { promisify } from 'util';
+import { promisify } from 'util';
 import * as fs from 'fs';
 import expandTilde = require('expand-tilde');
 import LaunchCtl from './helpers/LaunchCtl';
 
 const brew = require('homebrew-services');
+
+const readdirp = promisify(fs.readdir);
 
 function readAllUserAgents(): string[] {
   const agentsFolder = expandTilde('~/Library/LaunchAgents/');
@@ -34,13 +36,12 @@ export default class BrewExplorer implements TreeDataProvider<any> {
   }
 
   public async getChildren() {
-    const { services } = await brew.list()
-      .catch(() => ({ services: new Map() }));
-    return [...services.entries()];
+    const agentsFolder = expandTilde('~/Library/LaunchAgents/');
+    return await readdirp(agentsFolder);
   }
 
-  public getTreeItem(service: string[]): TreeItem {
-    const status = service[1] === 'started' ? 'started' : 'stopped';
+  public getTreeItem(path: string): TreeItem {
+    const status = 'started';
     const generatePath = (style: string) => `${__dirname}/../resources/${status}${style}.svg`;
 
     const iconPath = {
@@ -50,7 +51,7 @@ export default class BrewExplorer implements TreeDataProvider<any> {
 
     return {
       iconPath,
-      label: `${upperFirst(service[0])}: ${upperFirst(service[1])}`,
+      label: `${path}`,
       contextValue: 'serviceItem',
     };
   }
