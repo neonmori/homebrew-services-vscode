@@ -90,38 +90,38 @@
             "view/item/context": [
                 {
                     "command": "startService",
-                    "when": "view == brewExplorer && !(viewItem != serviceItemIDLE && viewItem != serviceItemERROR)",
-                    "group": "c_startstop"
+                    "when": "view == brewExplorer && viewItem != serviceItemUNLOADED && viewItem != serviceItemRUNNING",
+                    "group": "c_startstop@1"
                 },
                 {
                     "command": "stopService",
                     "when": "view == brewExplorer && viewItem == serviceItemRUNNING",
-                    "group": "c_startstop"
+                    "group": "c_startstop@2"
                 },
                 {
                     "command": "viewLog",
-                    "when": "view == brewExplorer && !(viewItem != serviceItemERROR && viewItem != serviceItemIDLE && viewItem != serviceItemRUNNING)",
-                    "group": "b_logs"
+                    "when": "view == brewExplorer",
+                    "group": "b_logs@1"
                 },
                 {
                     "command": "viewErrorLog",
-                    "when": "view == brewExplorer && !(viewItem != serviceItemERROR && viewItem != serviceItemIDLE && viewItem != serviceItemRUNNING)",
-                    "group": "b_logs"
+                    "when": "view == brewExplorer",
+                    "group": "b_logs@2"
                 },
                 {
                     "command": "loadService",
                     "when": "view == brewExplorer && viewItem == serviceItemUNLOADED",
-                    "group": "a_loadunload"
+                    "group": "a_loadunload@1"
                 },
                 {
                     "command": "unloadService",
-                    "when": "view == brewExplorer && !(viewItem != serviceItemERROR && viewItem != serviceItemIDLE && viewItem != serviceItemRUNNING)",
-                    "group": "a_loadunload"
+                    "when": "view == brewExplorer && viewItem != serviceItemUNLOADED",
+                    "group": "a_loadunload@2"
                 },
                 {
                     "command": "reloadService",
-                    "when": "view == brewExplorer && !(viewItem != serviceItemERROR && viewItem != serviceItemIDLE && viewItem != serviceItemRUNNING)",
-                    "group": "a_loadunload"
+                    "when": "view == brewExplorer && viewItem != serviceItemUNLOADED",
+                    "group": "a_loadunload@3"
                 }
             ],
             "view/title": [
