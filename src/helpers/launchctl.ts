@@ -3,7 +3,6 @@ import expandTilde = require('expand-tilde');
 import { parse } from 'fast-plist';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { start } from 'repl';
 
 const readFile = promisify(fs.readFile);
 const execp = promisify(exec);

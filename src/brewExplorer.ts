@@ -33,7 +33,8 @@ export default class BrewExplorer implements TreeDataProvider<any> {
 
   public async getTreeItem(service: LaunchCtl): Promise<TreeItem> {
     const status = await service.update();
-    const generatePath = (style: string) => `${__dirname}/../resources/${status}${style}.svg`;
+    const generatePath = 
+    (style: string) => `${__dirname}/../resources/${status.toLowerCase()}${style}.svg`;
 
     const iconPath = {
       light: generatePath('Light'),
@@ -42,7 +43,7 @@ export default class BrewExplorer implements TreeDataProvider<any> {
 
     return {
       iconPath,
-      label: service.name,
+      label: `${status} :: ${service.name}`,
       contextValue: `serviceItem${status}`,
     };
   }

@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import { promisify } from 'util';
-import LaunchCtl from './helpers/LaunchCtl';
+import { LaunchCtl } from './helpers/LaunchCtl';
 // import expandTilde = require('expand-tilde');
 
 const readdirp = promisify(fs.readdir);
