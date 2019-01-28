@@ -5,7 +5,14 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 
 const readFile = promisify(fs.readFile);
-const execp = promisify(exec);
+const execpp = promisify(exec);
+const execp = async (command: string): Promise<string> => {
+  const res = await execpp(command);
+  if (res.stderr && res.stderr.length > 0) {
+    throw new Error(res.stderr);
+  }
+  return res.stdout;
+};
 
 export enum LaunchCtlStatus {
   UNLOADED = 'UNLOADED',
@@ -42,15 +49,6 @@ export class LaunchCtl {
   }
 
   /**
-   * Checks if service currently running (asynchronous).
-   * @return {Promise}
-   */
-  public async isRunning(): Promise<boolean> {
-    const result = await execp('launchctl list');
-    return result.stdout.includes(this.name);
-  }
-
-  /**
    * Unloads service (asynchronous).
    */
   public async unload() {
@@ -72,7 +70,7 @@ export class LaunchCtl {
 
   public async update(): Promise<LaunchCtlStatus> {
     const output = await execp(`launchctl list`);
-    const lines = output.stdout ? output.stdout.split('\n').slice(1) : [];
+    const lines = output ? output.split('\n').slice(1) : [];
     const line = lines.filter(line => line.includes(this.name));
     if (line.length > 0) {
       const data = line[0].split(/\s+/);
@@ -94,7 +92,7 @@ export class LaunchCtl {
         // echo "--Running ($pid)"
         // echo "--No Errors"
       }
-      if (status > 0) {
+      if (status !== 0) {
         return LaunchCtlStatus.ERROR;
         // echo --Unload
         // echo --Reload
@@ -122,6 +120,10 @@ export class LaunchCtl {
   }
 
   public async viewLog(stderr: boolean) {
-    return await execp(`open -a Console ${stderr ? this.errorlog : this.log}`);
+    const logPath = stderr ? this.errorlog : this.log;
+    if (logPath && !logPath.includes('/dev/null')) {
+      return await execp(`open -a Console ${logPath}`);
+    }
+    throw Error('Log is not available for this service.');
   }
 }

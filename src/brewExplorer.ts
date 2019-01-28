@@ -91,9 +91,12 @@ export default class BrewExplorer implements TreeDataProvider<any> {
   }
 
   public async openLog(stderr: boolean, target: LaunchCtl) {
-    const message = `LaunchCtl: view ${stderr ? 'error ' : ' '}log for ${target.name}`;
-    return vscode.window.setStatusBarMessage(message, target.viewLog(stderr)
-      .catch(() => ({ status: 'error' }))
-      .then(() => this.refresh()));
+    try {
+      await target.viewLog(stderr);
+      const msg = `$(checklist) LaunchCtl: view ${stderr ? 'error ' : ''}log for ${target.name}`;
+      vscode.window.setStatusBarMessage(msg, 2000);
+    } catch (e) {
+      vscode.window.setStatusBarMessage(`$(alert) ${e}`, 2000);
+    }
   }
 }
