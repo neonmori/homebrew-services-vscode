@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import { TreeDataProvider, TreeItem } from 'vscode';
 import expandTilde = require('expand-tilde');
-import { LaunchCtl } from './helpers/LaunchCtl';
+import { LaunchCtl } from './launchctl';
 import { list as listServices } from './launchServices';
 
 export default class BrewExplorer implements TreeDataProvider<any> {

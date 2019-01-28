@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
-import brewExplorer from './brewExplorer';
+import launchctlExplorer from './launchctlExplorer';
 
 export function activate(context: vscode.ExtensionContext) {
-  const explorer = new brewExplorer(vscode.workspace.getConfiguration().get('brewer.labels'));
+  const explorer = new launchctlExplorer(vscode.workspace.getConfiguration().get('brewer.labels'));
 
-  vscode.window.registerTreeDataProvider('brewExplorer', explorer);
+  vscode.window.registerTreeDataProvider('launchctlExplorer', explorer);
 
   vscode.commands.registerCommand('viewLog', explorer.openLog.bind(explorer, false));
   vscode.commands.registerCommand('viewErrorLog', explorer.openLog.bind(explorer, true));

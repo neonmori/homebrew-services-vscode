@@ -1,9 +1,9 @@
 {
-    "name": "brew-services",
-    "displayName": "Brew Services",
-    "description": "Control Brew services in VS Code",
-    "version": "0.2.1",
-    "publisher": "beauallison",
+    "name": "launchctl-agents",
+    "displayName": "LaunchCtl Control Panel",
+    "description": "Control launchctl agents in VS Code",
+    "version": "0.0.1",
+    "publisher": "neonmori",
     "icon": "icon.png",
     "engines": {
         "vscode": "^1.21.0"
@@ -22,7 +22,7 @@
         "onCommand:stopService",
         "onCommand:restartService",
         "onCommand:refreshButton",
-        "onView:brewExplorer"
+        "onView:launchctlExplorer"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -72,52 +72,52 @@
             "view/item/context": [
                 {
                     "command": "startService",
-                    "when": "view == brewExplorer && viewItem != serviceItemUNLOADED && viewItem != serviceItemRUNNING",
+                    "when": "view == launchctlExplorer && viewItem != serviceItemUNLOADED && viewItem != serviceItemRUNNING",
                     "group": "c_startstop@1"
                 },
                 {
                     "command": "stopService",
-                    "when": "view == brewExplorer && viewItem == serviceItemRUNNING",
+                    "when": "view == launchctlExplorer && viewItem == serviceItemRUNNING",
                     "group": "c_startstop@2"
                 },
                 {
                     "command": "viewLog",
-                    "when": "view == brewExplorer",
+                    "when": "view == launchctlExplorer",
                     "group": "b_logs@1"
                 },
                 {
                     "command": "viewErrorLog",
-                    "when": "view == brewExplorer",
+                    "when": "view == launchctlExplorer",
                     "group": "b_logs@2"
                 },
                 {
                     "command": "loadService",
-                    "when": "view == brewExplorer && viewItem == serviceItemUNLOADED",
+                    "when": "view == launchctlExplorer && viewItem == serviceItemUNLOADED",
                     "group": "a_loadunload@1"
                 },
                 {
                     "command": "unloadService",
-                    "when": "view == brewExplorer && viewItem != serviceItemUNLOADED",
+                    "when": "view == launchctlExplorer && viewItem != serviceItemUNLOADED",
                     "group": "a_loadunload@2"
                 },
                 {
                     "command": "reloadService",
-                    "when": "view == brewExplorer && viewItem != serviceItemUNLOADED",
+                    "when": "view == launchctlExplorer && viewItem != serviceItemUNLOADED",
                     "group": "a_loadunload@3"
                 }
             ],
             "view/title": [
                 {
                     "command": "refreshButton",
-                    "when": "view == brewExplorer",
+                    "when": "view == launchctlExplorer",
                     "group": "navigation"
                 }
             ]
         },
         "views": {
-            "brewExplorer": [
+            "launchctlExplorer": [
                 {
-                    "id": "brewExplorer",
+                    "id": "launchctlExplorer",
                     "name": "Explorer"
                 }
             ]
@@ -126,7 +126,7 @@
             "activitybar": [
                 {
                     "icon": "resources/icon.svg",
-                    "id": "brewExplorer",
+                    "id": "launchctlExplorer",
                     "title": "Launch Agents"
                 }
             ]
@@ -156,7 +156,6 @@
     "dependencies": {
         "expand-tilde": "^2.0.2",
         "fast-plist": "^0.1.2",
-        "homebrew-services": "0.1.0",
         "vscode": "^1.1.27"
     },
     "jest": {
